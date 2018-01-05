@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import { DataService } from "./../data.service"
 import { MatTableDataSource } from '@angular/material';
 import { Element } from "./../item.model";
@@ -10,12 +10,15 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/operator/filter';
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })
 export class ListComponent implements OnInit {
+  @Output() edited: EventEmitter<Element> = new EventEmitter<Element>()
+  @Output() delete: EventEmitter<Element> = new EventEmitter<Element>()
   items: Element[]
   displayedColumns = ['name', 'status', 'description', 'options'];
   dataSource: MatTableDataSource<Element>;
@@ -26,9 +29,12 @@ export class ListComponent implements OnInit {
   constructor(private data: DataService) { }
 
   ngOnInit() {
-    this.items = this.data.getItems();
     this.dataSource = new MatTableDataSource();
-    this.dataSource.data = this.items;
+    this.data.getItems().subscribe(data => {
+      this.items = data;
+      this.dataSource.data = this.items;
+    });
+    
     Observable.fromEvent(this.filterName.nativeElement, 'keyup')
       .debounceTime(150)
       .distinctUntilChanged()
@@ -56,11 +62,11 @@ export class ListComponent implements OnInit {
     let endIndex = (page.pageIndex + 1) * page.pageSize;
     this.dataSource.data = this.items.slice(startIndex, endIndex);
   }
-  editItem() {
-    
+  editItem(il: Element) {
+    this.edited.emit(il)
   }
-  deleteItem() { 
-        
+  deleteItem(il:Element) { 
+    this.delete.emit(il)    
   }
 }
 interface Page {

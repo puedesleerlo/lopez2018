@@ -34,7 +34,7 @@
       <!-- Status Column -->
       <ng-container matColumnDef="status">
           <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
-          <mat-cell *matCellDef="let element"> {{element.status}} </mat-cell>
+          <mat-cell *matCellDef="let element"> {{element.isActive}} </mat-cell>
         </ng-container>
   
      <!-- Description Column -->
@@ -45,10 +45,10 @@
       <ng-container matColumnDef="options">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Options </mat-header-cell>
         <mat-cell *matCellDef="let element">
-            <button mat-mini-fab color="primary" (click)='editItem()'>
+            <button mat-mini-fab color="primary" (click)='editItem(element)'>
                 <mat-icon>edit</mat-icon>
             </button>
-            <button mat-mini-fab color="warn" (click)='deleteItem()'>
+            <button mat-mini-fab color="warn" (click)='deleteItem(element)'>
                 <mat-icon>delete</mat-icon>
             </button>
 

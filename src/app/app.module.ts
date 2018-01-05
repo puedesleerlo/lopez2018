@@ -7,7 +7,7 @@ import { ListComponent } from './list/list.component';
 import { AppRoutingModule } from './/app-routing.module';
 import { DetailComponent } from './detail/detail.component'
 import {DataService} from "./data.service"
-
+import { ReactiveFormsModule } from '@angular/forms';
 @NgModule({
   declarations: [
     AppComponent,
@@ -18,7 +18,8 @@ import {DataService} from "./data.service"
   imports: [
     BrowserModule,
     SharedModule,
-    AppRoutingModule
+    AppRoutingModule,
+    ReactiveFormsModule
   ],
   providers: [DataService],
   bootstrap: [AppComponent]

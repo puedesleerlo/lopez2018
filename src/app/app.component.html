@@ -1,7 +1,10 @@
-<mat-toolbar>Inventario <button mat-button>Nuevo Item</button></mat-toolbar>
+<mat-toolbar color="primary">Inventario
+    <span class="example-spacer"></span>
+    <button mat-button (click)="openDialog()">Nuevo Item</button>
+</mat-toolbar>
 <div fxLayout="row" fxLayout.xs="column">
     <div fxFlex>
-        <app-list></app-list>
+        <app-list (edited)="edit($event)"(delete)="delete($event) "></app-list>
     </div>
 
 </div>
