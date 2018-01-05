@@ -1,8 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import {DataService} from "./../data.service"
-import {DataSource} from '@angular/cdk/collections';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { DataService } from "./../data.service"
+import { MatTableDataSource } from '@angular/material';
+import { Element } from "./../item.model";
+import { MatPaginator } from '@angular/material';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/startWith';
+import 'rxjs/add/observable/merge';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/observable/fromEvent';
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
@@ -10,44 +17,54 @@ import 'rxjs/add/observable/of';
 })
 export class ListComponent implements OnInit {
   items: Element[]
-  displayedColumns = ['name', 'status', 'description'];
-  dataSource: any 
-  constructor(private data: DataService) {
-    
-   }
+  displayedColumns = ['name', 'status', 'description', 'options'];
+  dataSource: MatTableDataSource<Element>;
+
+  @ViewChild('filter') filterName: ElementRef;
+  @ViewChild('filter2') filterDescription: ElementRef;
+
+  constructor(private data: DataService) { }
 
   ngOnInit() {
     this.items = this.data.getItems();
-    this.dataSource = new ExampleDataSource(this.items);
-  }
+    this.dataSource = new MatTableDataSource();
+    this.dataSource.data = this.items;
+    Observable.fromEvent(this.filterName.nativeElement, 'keyup')
+      .debounceTime(150)
+      .distinctUntilChanged()
+      .subscribe(() => {
+        if (!this.dataSource) { return; }
+        this.dataSource.filterPredicate = (data: Element, filter: string) => {
+          return data.name == filter
+        }
+        this.dataSource.filter = this.filterName.nativeElement.value;
+      });
+    Observable.fromEvent(this.filterDescription.nativeElement, 'keyup')
+      .debounceTime(150)
+      .distinctUntilChanged()
+      .subscribe(() => {
+        if (!this.dataSource) { return; }
+        this.dataSource.filterPredicate = (data: Element, filter: string) => {
+          return data.description == filter
+        }
+        this.dataSource.filter = this.filterDescription.nativeElement.value;
+      });
 
+  }
+  pagChanges(page: Page) {
+    let startIndex = (page.pageIndex) * page.pageSize;
+    let endIndex = (page.pageIndex + 1) * page.pageSize;
+    this.dataSource.data = this.items.slice(startIndex, endIndex);
+  }
+  editItem() {
+    
+  }
+  deleteItem() { 
+        
+  }
 }
-
-export interface Element {
-  name: string;
-  description: string;
-  status: string;
-  isActive: boolean;
-  _id: string;
-  index: number;
-}
-
-
-
-/**
- * Data source to provide what data should be rendered in the table. The observable provided
- * in connect should emit exactly the data that should be rendered by the table. If the data is
- * altered, the observable should emit that new set of data on the stream. In our case here,
- * we return a stream that contains only one set of data that doesn't change.
- */
-export class ExampleDataSource extends DataSource<any> {
-  /** Connect function called by the table to retrieve one stream containing the data to render. */
-  constructor(private data: any[]) {
-    super();
-  }
-  connect(): Observable<Element[]> {
-    return Observable.of(this.data);
-  }
-
-  disconnect() {}
+interface Page {
+  pageIndex: number,
+  pageSize: number,
+  length: number
 }
