@@ -21,6 +21,8 @@ export class DetailComponent {
 
   createForm(data) {
     this.form = this.fb.group({
+      id: data.id,
+      index: data.index,
       name: [data.name, Validators.required], 
       isActive: [data.isActive, Validators.required],
       description: [data.description, Validators.required]

@@ -31,8 +31,10 @@ export class ListComponent implements OnInit {
   ngOnInit() {
     this.dataSource = new MatTableDataSource();
     this.data.getItems().subscribe(data => {
+      
       this.items = data;
       this.dataSource.data = this.items;
+
     });
     
     Observable.fromEvent(this.filterName.nativeElement, 'keyup')
@@ -41,7 +43,7 @@ export class ListComponent implements OnInit {
       .subscribe(() => {
         if (!this.dataSource) { return; }
         this.dataSource.filterPredicate = (data: Element, filter: string) => {
-          return data.name == filter
+          return data.name.toLowerCase().includes(filter.toLowerCase());
         }
         this.dataSource.filter = this.filterName.nativeElement.value;
       });
@@ -51,7 +53,7 @@ export class ListComponent implements OnInit {
       .subscribe(() => {
         if (!this.dataSource) { return; }
         this.dataSource.filterPredicate = (data: Element, filter: string) => {
-          return data.description == filter
+          return data.description.toLowerCase().includes(filter.toLowerCase());
         }
         this.dataSource.filter = this.filterDescription.nativeElement.value;
       });

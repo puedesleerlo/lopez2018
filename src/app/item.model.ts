@@ -3,6 +3,6 @@ export interface Element {
     description: string;
     status: string;
     isActive: boolean;
-    _id: string;
+    id: string;
     index: number;
   }
